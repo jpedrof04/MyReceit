@@ -1,49 +1,72 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+@using Microsoft.AspNetCore.Identity
+@using MyRecipes.Models
+
+@inject SignInManager<Usuario> SignInManager
+@inject UserManager<Usuario> UserManager
+
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - MyRecipes</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/MyRecipes.styles.css" asp-append-version="true" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] | MyRecipes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="~/css/darkStyle.css">
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">MyRecipes</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+    <nav class="navbar">
+        <a asp-action="Index" asp-controller="Home" class="logo-area">
+            <div class="logo-icon">
+                <i class="fas fa-utensils"></i>
+            </div>
+            <div class="logo-text">My<span>Recipes</span></div>
+        </a>
+
+        @if (SignInManager.IsSignedIn(User))
+        {
+            <div class="profile-section">
+                <div class="profile-preview">
+                    @if (!string.IsNullOrEmpty(UserManager.GetUserAsync(User).Result?.Foto))
+                    {
+                        <img class="avatar-img" src="@UserManager.GetUserAsync(User).Result.Foto" alt="@User.Identity?.Name">
+                    }
+                    else
+                    {
+                        <div class="avatar-placeholder">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    }
+                    <div class="user-info">
+                        <div class="user-name">@User.Identity?.Name</div>
+                        <div class="user-role"><i class="fas fa-chef-hat"></i>Usuário</div>
+                    </div>
+                </div>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#"><i class="fas fa-user"></i> Meu perfil</a>
+                    <a class="dropdown-item" href="#"><i class="fas fa-sliders-h"></i> Configurações</a>
+                    <form asp-action="Logout" asp-controller="Account" method="post">
+                        <button type="submit" class="dropdown-item" style="width: 100%; border: none; background: none; cursor: pointer;">
+                            <i class="fas fa-sign-out-alt"></i> Sair
+                        </button>
+                    </form>
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+        }
+        else
+        {
+            <div class="profile-section">
+                <a asp-action="Login" asp-controller="Account" class="btn-login" style="padding: 0.6rem 1.5rem; font-size: 1rem; margin: 0;">
+                    <i class="fas fa-sign-in-alt"></i> Entrar
+                </a>
+            </div>
+        }
+    </nav>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - MyRecipes - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
+    <main class="container">
+        @RenderBody()
+    </main>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
